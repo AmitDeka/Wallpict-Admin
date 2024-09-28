@@ -69,7 +69,7 @@ function AddWallpaper() {
         variant: "constructive",
         title: "Category created successfully.",
       });
-      setCategory(initialCategoryState);
+      setWallpaper(initialCategoryState);
       setResetKey((prevKey) => prevKey + 1);
     } catch (error) {
       toast({
