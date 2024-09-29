@@ -67,7 +67,7 @@ function AddWallpaper() {
       const response = await api.post("/api/wallpaper", wallpaper);
       toast({
         variant: "constructive",
-        title: "Category created successfully.",
+        title: "Wallpaper added successfully.",
       });
       setWallpaper(initialCategoryState);
       setResetKey((prevKey) => prevKey + 1);
@@ -76,7 +76,7 @@ function AddWallpaper() {
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description:
-          "Failed to create wallpaper. Please try again. Check Console log for more details.",
+          "Failed to add wallpaper. Please try again. Check Console log for more details.",
       });
       console.log(error);
     } finally {

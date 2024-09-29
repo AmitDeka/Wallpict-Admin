@@ -1,17 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 
-function HeroCards() {
+function HeroCards({ catCount, wallCount }) {
   const router = useRouter();
 
   const goToWallpaper = () => {
@@ -41,7 +35,7 @@ function HeroCards() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">11</div>
+          <div className="text-2xl font-bold">{wallCount}</div>
         </CardContent>
       </Card>
       <Card x-chunk="dashboard-01-chunk-1" className="relative overflow-hidden">
@@ -59,7 +53,7 @@ function HeroCards() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">12</div>
+          <div className="text-2xl font-bold">{catCount}</div>
         </CardContent>
       </Card>
     </div>

@@ -7,8 +7,11 @@ import {
 } from "@/components/ui/card";
 import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
+import { usePathname } from "next/navigation";
 
 function WallpaperCard({ wallpaperName, wallpaperId, wallpaperUri }) {
+  const pathname = usePathname();
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="p-0 pb-2">
@@ -21,14 +24,16 @@ function WallpaperCard({ wallpaperName, wallpaperId, wallpaperUri }) {
       <CardContent className="p-3 pt-0">
         <p className="text-lg font-bold truncate">{wallpaperName}</p>
       </CardContent>
-      <CardFooter className="float-end gap-2 p-3 pt-0">
-        <Button size="icon" variant="constructive">
-          <Pencil1Icon className="w-[22px] h-[22px]" />
-        </Button>
-        <Button size="icon" variant="destructive">
-          <TrashIcon className="w-[22px] h-[22px]" />
-        </Button>
-      </CardFooter>
+      {!pathname === "/dashboard" && (
+        <CardFooter className="float-end gap-2 p-3 pt-0">
+          <Button size="icon" variant="constructive">
+            <Pencil1Icon className="w-[22px] h-[22px]" />
+          </Button>
+          <Button size="icon" variant="destructive">
+            <TrashIcon className="w-[22px] h-[22px]" />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }
