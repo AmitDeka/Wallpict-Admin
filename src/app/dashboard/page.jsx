@@ -68,11 +68,15 @@ function Dashboard() {
     }
   };
 
-  const renderSkeletons = (count) => {
+  const renderSkeletons = (count, imageSkeletonHeight) => {
     return Array.from({ length: count }).map((_, index) => (
       <Card key={index} className="overflow-hidden">
         <CardHeader className="p-0 pb-2">
-          <CardTitle className="rounded-[4px] h-[80px] w-full bg-cover bg-center bg-no-repeat">
+          <CardTitle
+            className="rounded-[4px] w-full bg-cover bg-center bg-no-repeat"
+            style={{
+              height: imageSkeletonHeight,
+            }}>
             <Skeleton className="w-full h-full rounded-none" />
           </CardTitle>
         </CardHeader>
@@ -123,7 +127,7 @@ function Dashboard() {
 
           {isLoading && (
             <div className="md:grid-cols-3 lg:grid-cols-4 md:gap-6 grid grid-cols-2 gap-4">
-              {renderSkeletons(visibleCount)}
+              {renderSkeletons(visibleCount, "80px")}
             </div>
           )}
 
@@ -153,7 +157,7 @@ function Dashboard() {
           </h1>
           {isLoading && (
             <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6 grid grid-cols-1 gap-4">
-              {renderSkeletons(visibleCount)}
+              {renderSkeletons(visibleCount, "325px")}
             </div>
           )}
 
