@@ -35,11 +35,11 @@ function ImageUpload({ handleGetImageUrl, label }) {
 
     const fileSizeKB = Math.round(file.size / 1024);
 
-    if (fileSizeKB > 2048) {
+    if (fileSizeKB > 5120) {
       toast({
         variant: "destructive",
         title: "Upload error",
-        description: "Image size must less than 2MB.",
+        description: "Image size must less than 5MB.",
       });
       return;
     }
