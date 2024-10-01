@@ -20,6 +20,8 @@ function Dashboard() {
   const [category, setCategory] = useState([]);
   const [wallpaper, setWallpaper] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [wallTotalCount, setWallTotalCount] = useState(0);
+  const [catTotalCount, setCatTotalCount] = useState(0);
   const [error, setError] = useState(null);
   const visibleCount = 10;
 
@@ -32,9 +34,11 @@ function Dashboard() {
     try {
       const response = await api.get("/api/category");
       const categoryData = response?.data?.category || [];
+      const count = response?.data?.totalCount || 0;
+
       if (categoryData.length) {
         setCategory(categoryData);
-        setIsLoading(false);
+        setCatTotalCount(count);
       } else {
         setError("Nothing is in here 🥲");
       }
@@ -50,10 +54,19 @@ function Dashboard() {
 
   const getAllWallpaper = async () => {
     try {
-      const response = await api.get("/api/wallpaper");
+      const limit = 10;
+      const page = 1;
+
+      const response = await api.get(
+        `/api/wallpaper?page=${page}&limit=${limit}`
+      );
+
       const wallpaperData = response?.data?.wallpaper || [];
+      const count = response?.data?.totalCount || 0;
+
       if (wallpaperData.length) {
         setWallpaper(wallpaperData);
+        setWallTotalCount(count);
       } else {
         setError("Nothing is in here 🥲");
       }
@@ -61,7 +74,7 @@ function Dashboard() {
       setError(
         "Failed to fetch wallpaper from server. Check browser console for more information"
       );
-      console.log("Fetching error :", error.message);
+      console.log("Fetching error:", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -110,14 +123,11 @@ function Dashboard() {
       ));
   };
 
-  const catCount = category.length;
-  const wallCount = wallpaper.length;
-
   return (
     <>
       <Header />
       <section className="lg:p-8 md:p-6 p-4">
-        <HeroCards catCount={catCount} wallCount={wallCount} />
+        <HeroCards catCount={catTotalCount} wallCount={wallTotalCount} />
         <div className="mt-4 mb-2">
           <h1 className="inline-flex items-center mb-3 text-xl font-bold">
             Recently added Categories
