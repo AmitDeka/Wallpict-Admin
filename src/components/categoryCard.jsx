@@ -26,7 +26,9 @@ function CategoryCard({ categoryName, categoryId, categoryBgUri }) {
       <CardContent className="p-3 pt-0">
         <p className="text-lg font-bold truncate">{categoryName}</p>
       </CardContent>
-      {!pathname === "/dashboard" && (
+      {pathname === "/dashboard" ? (
+        ""
+      ) : (
         <CardFooter className="float-end gap-2 p-3 pt-0">
           <Button size="icon" variant="constructive">
             <Pencil1Icon className="w-5 h-5" />
