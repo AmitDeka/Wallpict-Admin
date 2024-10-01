@@ -18,7 +18,7 @@ function CategoryCard({ categoryName, categoryId, categoryBgUri }) {
     <Card className="overflow-hidden">
       <CardHeader className="p-0 pb-2">
         <CardTitle
-          className="rounded-[4px] h-[80px] bg-cover bg-center bg-no-repeat"
+          className="rounded-[4px] h-[100px] bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${categoryBgUri})`,
           }}></CardTitle>

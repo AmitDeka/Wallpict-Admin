@@ -52,7 +52,6 @@ function Dashboard() {
     try {
       const response = await api.get("/api/wallpaper");
       const wallpaperData = response?.data?.wallpaper || [];
-      console.log(wallpaperData);
       if (wallpaperData.length) {
         setWallpaper(wallpaperData);
       } else {
@@ -124,13 +123,11 @@ function Dashboard() {
             Recently added Categories
             <ArrowRightIcon className="w-4 h-4 ml-1" />
           </h1>
-
           {isLoading && (
             <div className="md:grid-cols-3 lg:grid-cols-4 md:gap-6 grid grid-cols-2 gap-4">
-              {renderSkeletons(visibleCount, "80px")}
+              {renderSkeletons(visibleCount, "100px")}
             </div>
           )}
-
           {!isLoading && error && (
             <Card className="md:w-8/12 lg:w-1/2 w-full mx-auto">
               <CardHeader className="py-4">
@@ -143,7 +140,6 @@ function Dashboard() {
               </CardContent>
             </Card>
           )}
-
           {!isLoading && !error && (
             <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6 grid grid-cols-1 gap-4">
               {renderCategories()}
@@ -160,7 +156,6 @@ function Dashboard() {
               {renderSkeletons(visibleCount, "325px")}
             </div>
           )}
-
           {!isLoading && error && (
             <Card className="md:w-8/12 lg:w-1/2 w-full mx-auto">
               <CardHeader className="py-4">
@@ -173,7 +168,6 @@ function Dashboard() {
               </CardContent>
             </Card>
           )}
-
           {!isLoading && !error && (
             <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6 grid grid-cols-1 gap-4">
               {renderWallpapers()}

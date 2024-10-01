@@ -47,7 +47,7 @@ function Category() {
     return Array.from({ length: count }).map((_, index) => (
       <Card key={index} className="overflow-hidden">
         <CardHeader className="p-0 pb-2">
-          <CardTitle className="rounded-[4px] h-[80px] w-full bg-cover bg-center bg-no-repeat">
+          <CardTitle className="rounded-[4px] h-[100px] w-full bg-cover bg-center bg-no-repeat">
             <Skeleton className="w-full h-full rounded-none" />
           </CardTitle>
         </CardHeader>

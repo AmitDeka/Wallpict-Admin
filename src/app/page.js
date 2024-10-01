@@ -52,7 +52,7 @@ export default function Home() {
               </CardHeader>
               <CardContent className="pb-4">
                 <CardTitle className="text-3xl text-center">
-                  Welcome To <span className="text-primary">WallPict</span>{" "}
+                  Welcome To <span className="text-primary">WallPict</span>
                   <br />
                   admin Panel
                 </CardTitle>
@@ -92,7 +92,7 @@ export default function Home() {
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    href="/forgot-password"
+                    href="/"
                     className="inline-block ml-auto text-sm underline">
                     Forgot your password?
                   </Link>
