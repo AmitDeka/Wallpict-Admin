@@ -43,6 +43,17 @@ function Category() {
     }
   };
 
+  const deleteCategory = async (categoryId) => {
+    try {
+      await api.delete(`/api/category/${categoryId}`);
+      setCategory((prevCategory) =>
+        prevCategory.filter((cat) => cat._id !== categoryId)
+      );
+    } catch (error) {
+      console.error("Failed to delete category:", error.message);
+    }
+  };
+
   const renderSkeletons = (count) => {
     return Array.from({ length: count }).map((_, index) => (
       <Card key={index} className="overflow-hidden">
@@ -66,8 +77,10 @@ function Category() {
     return category.map((cat) => (
       <CategoryCard
         key={cat._id}
+        categoryId={cat._id}
         categoryName={cat.categoryName}
         categoryBgUri={cat.categoryBanner}
+        onDelete={deleteCategory}
       />
     ));
   };

@@ -10,26 +10,35 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import WallpaperCard from "@/components/wallpaperCard";
 import { api } from "@/utils/api";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, HandIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function Wallpaper() {
   const [wallpaper, setWallpaper] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const skeletonCount = 12;
 
   useEffect(() => {
     getAllWallpaper();
-  }, []);
+  }, [page]);
 
   const getAllWallpaper = async () => {
     try {
-      const response = await api.get("/api/wallpaper");
+      const response = await api.get("/api/wallpaper", {
+        params: {
+          page,
+        },
+      });
       const wallpaperData = response?.data?.wallpaper || [];
-      console.log(wallpaperData);
+
       if (wallpaperData.length) {
-        setWallpaper(wallpaperData);
+        setWallpaper([...wallpaper, ...wallpaperData]);
+      } else if (wallpaperData.length < 12) {
+        setHasMore(false);
       } else {
         setError("No wallpapers found.");
       }
@@ -40,6 +49,17 @@ function Wallpaper() {
       console.log("Fetching error :", error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const deleteWallpaper = async (wallpaperId) => {
+    try {
+      await api.delete(`/api/wallpaper/${wallpaperId}`);
+      setCategory((prevWallpaper) =>
+        prevWallpaper.filter((cat) => cat._id !== wallpaperId)
+      );
+    } catch (error) {
+      console.error("Failed to delete category:", error.message);
     }
   };
 
@@ -66,10 +86,18 @@ function Wallpaper() {
     return wallpaper.map((wall) => (
       <WallpaperCard
         key={wall._id}
+        wallpaperId={wall._id}
         wallpaperName={wall.wallpaperName}
         wallpaperUri={wall.wallpaperURL}
+        onDelete={deleteWallpaper}
       />
     ));
+  };
+
+  const fetchMoreWallpaper = () => {
+    if (hasMore) {
+      setPage(page + 1);
+    }
   };
 
   return (
@@ -102,9 +130,27 @@ function Wallpaper() {
           )}
 
           {!isLoading && !error && (
-            <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:gap-6 grid grid-cols-1 gap-4">
-              {renderWallpapers()}
-            </div>
+            <InfiniteScroll
+              className=""
+              dataLength={wallpaper.length}
+              next={fetchMoreWallpaper}
+              hasMore={hasMore}
+              loader={
+                <div className="text-muted-foreground inline-flex items-center justify-center w-full my-4 text-center">
+                  <UpdateIcon className="animate-spin w-5 h-5"></UpdateIcon>
+                  <h6 className="ms-2 text-lg">Fetching more data</h6>
+                </div>
+              }
+              endMessage={
+                <div className="text-muted-foreground inline-flex items-center justify-center w-full my-4 text-center">
+                  <HandIcon className="animate-pulse w-5 h-5"></HandIcon>
+                  <h6 className="ms-2 text-lg">Hey! You have seen it all.</h6>
+                </div>
+              }>
+              <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:gap-6 grid grid-cols-1 gap-4">
+                {renderWallpapers()}
+              </div>
+            </InfiniteScroll>
           )}
         </div>
       </section>
