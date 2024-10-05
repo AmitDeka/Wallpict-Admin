@@ -19,6 +19,7 @@ function Wallpaper() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [error, setError] = useState(null);
   const skeletonCount = 12;
 
@@ -27,6 +28,11 @@ function Wallpaper() {
   }, [page]);
 
   const getAllWallpaper = async () => {
+    if (page === 1) {
+      setIsLoading(true); // Initial loading
+    } else {
+      setIsFetchingMore(true); // Loading more wallpapers during infinite scroll
+    }
     try {
       const response = await api.get("/api/wallpaper", {
         params: {
@@ -37,6 +43,8 @@ function Wallpaper() {
 
       if (wallpaperData.length) {
         setWallpaper([...wallpaper, ...wallpaperData]);
+        setIsLoading(false);
+        setIsFetchingMore(false);
       } else if (wallpaperData.length < 12) {
         setHasMore(false);
       } else {
@@ -49,13 +57,14 @@ function Wallpaper() {
       console.log("Fetching error :", error.message);
     } finally {
       setIsLoading(false);
+      setIsFetchingMore(false);
     }
   };
 
   const deleteWallpaper = async (wallpaperId) => {
     try {
       await api.delete(`/api/wallpaper/${wallpaperId}`);
-      setCategory((prevWallpaper) =>
+      setWallpaper((prevWallpaper) =>
         prevWallpaper.filter((cat) => cat._id !== wallpaperId)
       );
     } catch (error) {
@@ -75,6 +84,7 @@ function Wallpaper() {
           <Skeleton className="w-full h-[28px]" />
         </CardContent>
         <CardFooter className="float-end gap-2 p-3 pt-0">
+          <Skeleton className="h-9 w-9" />
           <Skeleton className="h-9 w-9" />
           <Skeleton className="h-9 w-9" />
         </CardFooter>
@@ -134,6 +144,7 @@ function Wallpaper() {
               className=""
               dataLength={wallpaper.length}
               next={fetchMoreWallpaper}
+              scrollThreshold={1.01}
               hasMore={hasMore}
               loader={
                 <div className="text-muted-foreground inline-flex items-center justify-center w-full my-4 text-center">
@@ -149,6 +160,7 @@ function Wallpaper() {
               }>
               <div className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:gap-6 grid grid-cols-1 gap-4">
                 {renderWallpapers()}
+                {isFetchingMore && renderSkeletons(skeletonCount)}
               </div>
             </InfiniteScroll>
           )}

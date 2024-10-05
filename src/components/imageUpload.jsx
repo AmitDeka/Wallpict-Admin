@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle } from "./ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   getStorage,
   ref,
@@ -12,8 +12,10 @@ import { app } from "@/utils/firebase";
 import { Button } from "./ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import { Skeleton } from "./ui/skeleton";
 
-function ImageUpload({ handleGetImageUrl, label }) {
+function ImageUpload({ handleGetImageUrl, label, initialImageUrl }) {
   const storage = getStorage(app);
 
   const { toast } = useToast();
@@ -21,6 +23,12 @@ function ImageUpload({ handleGetImageUrl, label }) {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadPercent, setUploadPercent] = useState(0);
+
+  useEffect(() => {
+    if (initialImageUrl) {
+      setSelectedFile(initialImageUrl);
+    }
+  }, [initialImageUrl]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -122,12 +130,18 @@ function ImageUpload({ handleGetImageUrl, label }) {
       {loading ? (
         <Card className="bg-primary/5 overflow-hidden border-0 shadow-none">
           <CardHeader className="p-0">
-            <CardTitle className="rounded-[4px] h-[125px] md:h-[150px] lg:h-[175px] bg-cover bg-center bg-no-repeat flex flex-col justify-center items-center">
-              <Button variant="ghost" disabled>
-                <ReloadIcon className="animate-spin w-4 h-4 mr-2" />
-                Uploading Image
-              </Button>
-              <span className="text-primary/60">{uploadPercent}% Done</span>
+            <CardTitle className="rounded-[4px] h-[125px] md:h-[150px] lg:h-[175px]">
+              <Skeleton className="w-full h-full">
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p className="text-muted-foreground flex font-medium">
+                    <ReloadIcon className="animate-spin w-4 h-4 mr-2" />
+                    Uploading Image
+                  </p>
+                  <p className="text-muted-foreground mt-2 font-normal">
+                    {uploadPercent}% Done
+                  </p>
+                </div>
+              </Skeleton>
             </CardTitle>
           </CardHeader>
         </Card>
@@ -135,11 +149,16 @@ function ImageUpload({ handleGetImageUrl, label }) {
         selectedFile && (
           <Card className="overflow-hidden">
             <CardHeader className="p-0">
-              <CardTitle
-                className="rounded-[4px] h-[125px] md:h-[150px] lg:h-[175px] bg-cover bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${selectedFile})`,
-                }}></CardTitle>
+              <CardTitle className="rounded-[4px] h-[125px] md:h-[150px] lg:h-[175px] relative">
+                <Image
+                  src={selectedFile}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  alt="Image"
+                  loading="lazy"
+                  quality={80}
+                />
+              </CardTitle>
             </CardHeader>
           </Card>
         )

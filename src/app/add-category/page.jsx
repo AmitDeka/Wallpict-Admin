@@ -14,10 +14,16 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
 import { FileTextIcon, ReloadIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 
 function AddCategory() {
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("id");
+
+  const isEditMode = !!categoryId;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,6 +35,30 @@ function AddCategory() {
   const [category, setCategory] = useState(initialCategoryState);
   const [resetKey, setResetKey] = useState(0);
 
+  useEffect(() => {
+    if (isEditMode) {
+      fetchCategoryData(categoryId);
+    }
+  }, [isEditMode, categoryId]);
+
+  const fetchCategoryData = async (id) => {
+    try {
+      const response = await api.get(`/api/category/${id}`);
+      const categoryData = response.data.category;
+      setCategory({
+        categoryName: categoryData.categoryName,
+        categoryBanner: categoryData.categoryBanner,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error fetching category data.",
+        description: "Unable to load category for editing.",
+      });
+      console.error(error);
+    }
+  };
+
   const handleGetImageUrl = (url) => {
     if (url) {
       setCategory((prev) => ({
@@ -38,24 +68,32 @@ function AddCategory() {
     }
   };
 
-  const handleCreateCategory = async () => {
+  const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await api.post("/api/category", category);
-      toast({
-        variant: "constructive",
-        title: "Category created successfully.",
-      });
-      setCategory(initialCategoryState);
-      setResetKey((prevKey) => prevKey + 1);
+      if (isEditMode) {
+        await api.put(`/api/category/${categoryId}`, category);
+        toast({
+          variant: "constructive",
+          title: "Category updated successfully.",
+        });
+      } else {
+        await api.post("/api/category", category);
+        toast({
+          variant: "constructive",
+          title: "Category created successfully.",
+        });
+        setCategory(initialCategoryState);
+        setResetKey((prevKey) => prevKey + 1);
+      }
+      router.push("/category");
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description:
-          "Failed to create category. Please try again. Check Console log for more details.",
+        title: `Failed to ${isEditMode ? "update" : "create"} category.`,
+        description: "Please try again. Check the console for more details.",
       });
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +106,9 @@ function AddCategory() {
         <div className="md:w-3/5 w- w-full mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Add Category</CardTitle>
+              <CardTitle className="text-2xl">
+                {isEditMode ? "Edit Category" : "Add Category"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="gap-y-4 grid">
               <div className="grid w-full items-center gap-1.5">
@@ -90,16 +130,17 @@ function AddCategory() {
                 />
               </div>
               <ImageUpload
-                label="Choose Background"
+                label="Choose Banner"
                 key={resetKey}
                 handleGetImageUrl={handleGetImageUrl}
+                initialImageUrl={category.categoryBanner}
               />
             </CardContent>
             <CardFooter className="justify-end">
               <Button
                 size="lg"
                 variant="default"
-                onClick={handleCreateCategory}
+                onClick={handleSubmit}
                 disabled={
                   !category.categoryName ||
                   !category.categoryBanner ||
@@ -108,12 +149,12 @@ function AddCategory() {
                 {isLoading ? (
                   <>
                     <ReloadIcon className="animate-spin w-4 h-4 mr-1" />
-                    Saving...
+                    {isEditMode ? "Updating..." : "Saving..."}
                   </>
                 ) : (
                   <>
                     <FileTextIcon className="w-4 h-4 mr-1" />
-                    Save
+                    {isEditMode ? "Update Category" : "Save Category"}
                   </>
                 )}
               </Button>

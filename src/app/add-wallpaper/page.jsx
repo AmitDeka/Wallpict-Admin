@@ -20,37 +20,81 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileTextIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/utils/api";
 
 function AddWallpaper() {
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const wallpaperId = searchParams.get("id");
+
+  const isEditMode = !!wallpaperId;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [category, setCategory] = useState([]);
 
-  useEffect(() => {
-    getAllCategory();
-  }, []);
-
-  const getAllCategory = async () => {
-    try {
-      const response = await api.get("/api/category");
-      setCategory(response?.data?.category);
-    } catch (error) {
-      console.log("Failed to fetch category from server. ", error);
-    }
-  };
-
-  const initialCategoryState = {
+  const initialWallpaperState = {
     wallpaperName: "",
     wallpaperResolution: "",
     categoryName: "",
     wallpaperURL: "",
   };
 
-  const [wallpaper, setWallpaper] = useState(initialCategoryState);
+  const [wallpaper, setWallpaper] = useState(initialWallpaperState);
   const [resetKey, setResetKey] = useState(0);
+  const [category, setCategory] = useState([]);
+
+  useEffect(() => {
+    fetchCategories();
+    if (isEditMode && wallpaperId) {
+      fetchWallpaperData(wallpaperId);
+    }
+  }, [isEditMode, wallpaperId]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get("/api/category");
+      const categoryData = response?.data?.category || [];
+      setCategory(categoryData);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error fetching categories.",
+        description: "Unable to load categories for selection.",
+      });
+      console.error(error);
+    }
+  };
+
+  const fetchWallpaperData = async (id) => {
+    try {
+      const response = await api.get(`/api/wallpaper/${id}`);
+      const wallpaperData = response?.data?.wallpaper;
+      if (wallpaperData) {
+        setWallpaper({
+          wallpaperName: wallpaperData.wallpaperName,
+          wallpaperResolution: wallpaperData.wallpaperResolution,
+          categoryName: wallpaperData.categoryName,
+          wallpaperURL: wallpaperData.wallpaperURL,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Wallpaper not found.",
+          description: "The wallpaper you are trying to edit does not exist.",
+        });
+        router.push("/wallpaper");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error fetching wallpaper data.",
+        description: "Unable to load wallpaper for editing.",
+      });
+      console.error(error);
+    }
+  };
 
   const handleGetImageUrl = (url) => {
     if (url) {
@@ -61,28 +105,75 @@ function AddWallpaper() {
     }
   };
 
-  const handleCreateWallpaper = async () => {
+  const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await api.post("/api/wallpaper", wallpaper);
-      toast({
-        variant: "constructive",
-        title: "Wallpaper added successfully.",
-      });
-      setWallpaper(initialCategoryState);
-      setResetKey((prevKey) => prevKey + 1);
+      if (isEditMode) {
+        await api.put(`/api/wallpaper/${wallpaperId}`, wallpaper);
+        toast({
+          variant: "constructive",
+          title: "Wallpaper updated successfully.",
+        });
+      } else {
+        await api.post("/api/wallpaper", wallpaper);
+        toast({
+          variant: "constructive",
+          title: "Wallpaper created successfully.",
+        });
+        setWallpaper(initialWallpaperState);
+        setResetKey((prevKey) => prevKey + 1);
+      }
+      router.push("/wallpaper");
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description:
-          "Failed to add wallpaper. Please try again. Check Console log for more details.",
+        title: `Failed to ${isEditMode ? "update" : "create"} wallpaper.`,
+        description: "Please try again. Check the console for more details.",
       });
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // const handleSubmit = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     if (isEditMode) {
+  //       await api.put(`/api/wallpaper/${wallpaperId}`, wallpaper);
+  //       toast({
+  //         variant: "constructive",
+  //         title: "Wallpaper updated successfully.",
+  //       });
+  //     } else {
+  //       await api.post("/api/wallpaper", wallpaper);
+  //       toast({
+  //         variant: "constructive",
+  //         title: "Wallpaper added successfully.",
+  //       });
+  //       setWallpaper(initialWallpaperState);
+  //       setResetKey((prevKey) => prevKey + 1);
+  //     }
+  //     router.push("/category");
+
+  //     // const response = await api.post("/api/wallpaper", wallpaper);
+  //     // toast({
+  //     //   variant: "constructive",
+  //     //   title: "Wallpaper added successfully.",
+  //     // });
+  //     // setWallpaper(initialWallpaperState);
+  //     // setResetKey((prevKey) => prevKey + 1);
+  //   } catch (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: `Failed to ${isEditMode ? "update" : "create"} wallpaper.`,
+  //       description: "Please try again. Check the console for more details.",
+  //     });
+  //     console.error(error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -91,7 +182,9 @@ function AddWallpaper() {
         <div className="md:w-3/5 w- w-full mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Add Wallpaper</CardTitle>
+              <CardTitle className="text-2xl">
+                {isEditMode ? "Edit Wallpaper" : "Add Wallpaper"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="gap-y-4 grid">
               <div className="grid w-full items-center gap-1.5">
@@ -160,13 +253,14 @@ function AddWallpaper() {
                 label="Choose Wallpaper"
                 key={resetKey}
                 handleGetImageUrl={handleGetImageUrl}
+                initialImageUrl={wallpaper.wallpaperURL}
               />
             </CardContent>
             <CardFooter className="justify-end">
               <Button
                 size="lg"
                 variant="default"
-                onClick={handleCreateWallpaper}
+                onClick={handleSubmit}
                 disabled={
                   !wallpaper.wallpaperName ||
                   !wallpaper.wallpaperResolution ||
@@ -177,12 +271,12 @@ function AddWallpaper() {
                 {isLoading ? (
                   <>
                     <ReloadIcon className="animate-spin w-4 h-4 mr-1" />
-                    Saving...
+                    {isEditMode ? "Updating..." : "Saving..."}
                   </>
                 ) : (
                   <>
                     <FileTextIcon className="w-4 h-4 mr-1" />
-                    Save
+                    {isEditMode ? "Update Wallpaper" : "Add Wallpaper"}
                   </>
                 )}
               </Button>

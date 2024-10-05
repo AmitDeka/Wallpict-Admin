@@ -14,16 +14,16 @@ import Image from "next/image";
 
 function Header() {
   return (
-    <header className="bg-background md:px-6 sticky top-0 z-10 flex items-center justify-between h-16 gap-4 px-4 border-b">
+    <header className="bg-background md:px-6 z-10 flex items-center justify-between h-16 gap-4 px-4 border-b">
       <nav className="md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6 flex-col hidden gap-6 text-lg font-medium">
         <Link
           href="/dashboard"
           className="md:text-base flex items-center gap-2 text-lg font-semibold">
           <Image
             src="/images/logoSmall.png"
-            height={44}
-            width={44}
-            className="object-contain"
+            height={0}
+            width={0}
+            className="w-11 object-contain h-auto"
             alt="logo"
           />
           <span className="sr-only">WallPict Admin Panel</span>
@@ -68,9 +68,9 @@ function Header() {
               className="flex items-center gap-2 text-lg font-semibold">
               <Image
                 src="/images/logoSmall.png"
-                height={60}
-                width={60}
-                className="object-contain"
+                height={0}
+                width={0}
+                className="object-contain w-16 h-auto"
                 alt="logo"
               />
               <span className="sr-only">WallPict Admin Panel</span>
@@ -112,9 +112,10 @@ function Header() {
             <Button variant="secondary" size="icon" className="rounded-full">
               <Image
                 src="/images/logo.svg"
-                width={24}
-                height={24}
                 alt="User Image"
+                height={0}
+                width={0}
+                className="object-contain w-6 h-auto"
               />
               <span className="sr-only">Toggle user menu</span>
             </Button>
