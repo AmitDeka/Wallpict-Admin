@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
 import { FileTextIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
 function AddCategory() {
   const { toast } = useToast();
@@ -100,7 +100,7 @@ function AddCategory() {
   };
 
   return (
-    <>
+    <Suspense fallback={<>Loding...</>}>
       <Header />
       <section className="lg:p-8 md:p-6 p-4">
         <div className="md:w-3/5 w- w-full mx-auto">
@@ -162,7 +162,7 @@ function AddCategory() {
           </Card>
         </div>
       </section>
-    </>
+    </Suspense>
   );
 }
 export default AddCategory;
