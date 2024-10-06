@@ -1,6 +1,7 @@
 "use client";
 import Header from "@/components/header";
 import ImageUpload from "@/components/imageUpload";
+import LoadingFallback from "@/components/loadingFallback";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +18,7 @@ import { FileTextIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 
-function AddCategory() {
+function AddCategoryContent() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -100,7 +101,7 @@ function AddCategory() {
   };
 
   return (
-    <Suspense fallback={<>Loding...</>}>
+    <>
       <Header />
       <section className="lg:p-8 md:p-6 p-4">
         <div className="md:w-3/5 w- w-full mx-auto">
@@ -162,7 +163,15 @@ function AddCategory() {
           </Card>
         </div>
       </section>
+    </>
+  );
+}
+
+// export default AddCategory;
+export default function AddCategory() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AddCategoryContent />
     </Suspense>
   );
 }
-export default AddCategory;

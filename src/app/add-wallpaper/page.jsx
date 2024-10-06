@@ -23,8 +23,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { api } from "@/utils/api";
+import LoadingFallback from "@/components/loadingFallback";
 
-function AddWallpaper() {
+function AddWallpaperContent() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -136,47 +137,8 @@ function AddWallpaper() {
     }
   };
 
-  // const handleSubmit = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     if (isEditMode) {
-  //       await api.put(`/api/wallpaper/${wallpaperId}`, wallpaper);
-  //       toast({
-  //         variant: "constructive",
-  //         title: "Wallpaper updated successfully.",
-  //       });
-  //     } else {
-  //       await api.post("/api/wallpaper", wallpaper);
-  //       toast({
-  //         variant: "constructive",
-  //         title: "Wallpaper added successfully.",
-  //       });
-  //       setWallpaper(initialWallpaperState);
-  //       setResetKey((prevKey) => prevKey + 1);
-  //     }
-  //     router.push("/category");
-
-  //     // const response = await api.post("/api/wallpaper", wallpaper);
-  //     // toast({
-  //     //   variant: "constructive",
-  //     //   title: "Wallpaper added successfully.",
-  //     // });
-  //     // setWallpaper(initialWallpaperState);
-  //     // setResetKey((prevKey) => prevKey + 1);
-  //   } catch (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: `Failed to ${isEditMode ? "update" : "create"} wallpaper.`,
-  //       description: "Please try again. Check the console for more details.",
-  //     });
-  //     console.error(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   return (
-    <Suspense fallback={<>Loding...</>}>
+    <>
       <Header />
       <section className="lg:p-8 md:p-6 p-4">
         <div className="md:w-3/5 w- w-full mx-auto">
@@ -284,7 +246,15 @@ function AddWallpaper() {
           </Card>
         </div>
       </section>
+    </>
+  );
+}
+// export default AddWallpaper;
+
+export default function AddWallpaper() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AddWallpaperContent />
     </Suspense>
   );
 }
-export default AddWallpaper;
